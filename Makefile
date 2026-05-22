@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -std=c11 -Iinclude -Ithirdparty
 # Тесты без -Werror, т.к. ctest.h несовместим с GCC 13
-TEST_CFLAGS = -Wall -Wextra -std=c11 -Iinclude -isystem -Ithirdparty
+TEST_CFLAGS = -Wall -Wextra -std=c11 -Iinclude -isystem thirdparty
 
 SRC_DIR = src
 OBJ_DIR = obj
