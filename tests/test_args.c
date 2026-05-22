@@ -172,3 +172,45 @@ CTEST(args, too_many_positional_args)
     const ParseResult r = parse_args(4, argv, &opts);
     ASSERT_EQUAL(PARSE_ERROR, r);
 }
+
+CTEST(args, print_help_does_not_crash)
+{
+    print_help();
+}
+
+CTEST(args, print_version_does_not_crash)
+{
+    print_version();
+}
+
+CTEST(args, invalid_nonnumeric_length)
+{
+    char* argv[] = {"pwgen", "abc"};
+    PwgenOptions opts;
+    set_default_options(&opts);
+
+    const ParseResult r = parse_args(2, argv, &opts);
+    ASSERT_EQUAL(PARSE_ERROR, r);
+}
+
+CTEST(args, unknown_flag)
+{
+    char* argv[] = {"pwgen", "-z"};
+    PwgenOptions opts;
+    set_default_options(&opts);
+
+    const ParseResult r = parse_args(2, argv, &opts);
+    ASSERT_EQUAL(PARSE_ERROR, r);
+}
+
+CTEST(args, only_length_positional)
+{
+    char* argv[] = {"pwgen", "12"};
+    PwgenOptions opts;
+    set_default_options(&opts);
+
+    const ParseResult r = parse_args(2, argv, &opts);
+    ASSERT_EQUAL(PARSE_OK, r);
+    ASSERT_EQUAL(12, opts.length);
+    ASSERT_EQUAL(1, opts.count);
+}
