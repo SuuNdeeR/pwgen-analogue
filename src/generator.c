@@ -77,7 +77,7 @@ static void ensure_requirements(char* pwd, int len, const PwgenOptions* opts)
 int generate_password(char* buf, int length, const PwgenOptions* opts)
 {
     if (!buf || length <= 0 || !opts)
-        return -1;
+        return 2;
 
     // Однократная инициализация rand() для стандартного режима
     static int rand_initialized = 0;
@@ -89,7 +89,7 @@ int generate_password(char* buf, int length, const PwgenOptions* opts)
     char alphabet[256];
     int alen = charset_build(opts, alphabet, sizeof(alphabet));
     if (alen <= 0)
-        return -1;
+        return 2;
 
     for (int i = 0; i < length; i++) {
         int idx = opts->secure ? random_index(alen) : (rand() % alen);
