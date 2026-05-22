@@ -1,0 +1,20 @@
+# Бинарники и объекты
+bin/*
+obj/*
+!bin/.gitkeep
+!obj/.gitkeep
+*.o
+*.out
+pwgen
+test_pwgen
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+EOF
