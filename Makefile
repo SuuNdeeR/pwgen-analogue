@@ -52,6 +52,9 @@ $(TEST_TARGET): $(TEST_OBJ_FILES) $(SRC_OBJ_FOR_TEST)
 $(OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(TEST_CFLAGS) -c -o $@ $<
 
+format:
+	clang-format -i $(SRC_DIR)/*.c include/*.h $(TEST_DIR)/*.c
+
 # Проверка стиля кода через clang-format
 check-style:
 	@echo "=== Проверка стиля кода ==="
@@ -79,5 +82,5 @@ coverage:
 
 # Полная очистка проекта
 clean:
-	rm -rf $(OBJ_DIR)/*.o $(TARGET) $(TEST_PWGEN)
+	rm -rf $(OBJ_DIR)/*.o $(TARGET) $(TEST_TARGET)
 	rm -f *.gcov *.gcda *.gcno

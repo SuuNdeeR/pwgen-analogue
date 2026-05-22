@@ -74,10 +74,11 @@ CTEST(generator, invalid_inputs)
 {
     PwgenOptions opts;
     set_default_options(&opts);
-    
-    // Проверяем реакцию функции на некорректные параметры (должна возвращать ошибку, например -1)
+
+    // Проверяем реакцию функции на некорректные параметры (должна возвращать
+    // ошибку, например -1)
     ASSERT_EQUAL(2, generate_password(NULL, 10, &opts));
-    
+
     char buf[10];
     ASSERT_EQUAL(2, generate_password(buf, 0, &opts));
     ASSERT_EQUAL(2, generate_password(buf, -5, &opts));
