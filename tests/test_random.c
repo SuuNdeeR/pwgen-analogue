@@ -32,3 +32,16 @@ CTEST(random_module, invalid_max)
 
     random_cleanup();
 }
+
+CTEST(random_module, index_without_init_returns_zero)
+{
+    // g_urandom_fd == -1
+    ASSERT_EQUAL(0, random_index(10));
+}
+
+CTEST(random_module, cleanup_without_init_safe)
+{
+    // Не должно упасть, если cleanup вызван без init
+    random_cleanup();
+    random_cleanup(); // двойной cleanup
+}
