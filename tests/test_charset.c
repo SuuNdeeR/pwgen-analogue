@@ -91,3 +91,29 @@ CTEST(charset, conflict_numerals_and_no_numerals)
     ASSERT_EQUAL(26, len); // только строчные
     ASSERT_TRUE(strchr(buf, '0') == NULL);
 }
+
+CTEST(charset, null_opts_returns_zero)
+{
+    char buf[256];
+    const int len = charset_build(NULL, buf, sizeof(buf));
+    ASSERT_EQUAL(0, len);
+}
+
+CTEST(charset, zero_out_size_returns_zero)
+{
+    char buf[256];
+    PwgenOptions opts = {0};
+    const int len = charset_build(&opts, buf, 0);
+    ASSERT_EQUAL(0, len);
+}
+
+CTEST(charset, too_small_buffer_returns_zero)
+{
+    char buf[2];
+    PwgenOptions opts = {0};
+    opts.capitalize = true;
+    opts.numerals = true;
+    opts.symbols = true;
+    const int len = charset_build(&opts, buf, sizeof(buf));
+    ASSERT_EQUAL(0, len);
+}
