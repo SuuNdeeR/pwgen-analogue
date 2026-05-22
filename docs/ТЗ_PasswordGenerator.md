@@ -4,7 +4,7 @@
 **Команда:** Ступин Егор, Заруднев Андрей, Бубенин Виктор — ИВ-521  
 **Язык реализации:** C (стандарт C11)  
 **Репозиторий:** GitHub  
-**Версия ТЗ:** 1.0
+**Версия ТЗ:** 1.1
 
 ---
 
@@ -269,7 +269,7 @@ int generate_password(char *buf, int length, const PwgenOptions *opts);
 - Печать одного пароля в `stdout` с переводом строки
 
 **Инфраструктура:**
-- `Makefile`: цели `test`, `check-style`, `format`, `clean`.
+- `Makefile`: цели `test`, `check-style`, `format`, `coverage`, `clean`.
 - GitHub Actions CI: сборка, проверка стиля (`clang-format --dry-run --Werror`), запуск тестов.
 - `.clang-format`, `thirdparty/ctest.h`, `.gitignore`, `README.md`.
 
@@ -285,7 +285,7 @@ void output_print(const char *password);
 ```
 
 **Задачи (Issues):**
-- Настроить `Makefile` (`make`, `make format`, `make check-style`, `make test`, `make clean`).
+- Настроить `Makefile` (`make`, `make format`, `make check-style`, `make test`, `make coverage`, `make clean`).
 - Реализация `random.c` (чтение /dev/urandom).
 - Реализация `output.c`.
 - Настроить CI в GitHub Actions (сборка + тесты на каждый push/Pull Request).
@@ -308,7 +308,7 @@ unit-testing framework для C. Представляет собой единс�
 |-------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | `args`      | Дефолтные значения; флаги парсятся верно; конфликт `-c -A` и тому подобные разрешается в пользу последнего; невалидная длина возвращает ошибку.  |
 | `generator` | Длина пароля совпадает с запрошенной; при `-c` есть хотя бы одна заглавная буква; при `-B` отсутствуют неоднозначные символы.                    |
-| `output`    | Функция вывода отрабатывает без ошибок при передаче одного пароля.                                                                                       |
+| `output`    | Функция вывода отрабатывает без ошибок при передаче одного пароля.                                                                               |
 | `charset`   | Состав алфавита при разных флагах; фильтрация -B                                                                                                 |
 | `random`    | random_index в диапазоне [0, max); ошибка при недоступности /dev/urandom                                                                         |
 
@@ -322,6 +322,7 @@ make             — сборка bin/pwgen
 make check-style — проверка форматирования (не изменяет файлы)
 make format      — автоматического применения .clang-format ко всем *.c и *.h.
 make test        — сборка и запуск тестов
+make coverage    — тесты + отчёт покрытия (минимум 60%)
 make clean       — очистка артефактов
 ```
 
@@ -335,6 +336,7 @@ Makefile кладёт бинарники в `bin/` и объектные фай�
 1. `make`               — компиляция без ошибок.
 2. `make check-style`   — код корректно отформатирован.
 3. `make test`          — все тесты проходят.
+4. `make coverage`      — отчёт % покрытия.
 
 **Ветки:** `issue-<номер>[-описание]`, например `issue-3-arg-parsing`.  
 **Коммиты:** `Issue-N: краткое описание` (например, `Issue-3: add flag parsing`).  

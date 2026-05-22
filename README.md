@@ -105,11 +105,12 @@ make test
 ## Команды Makefile
 
 ```bash
-make              # сборка бинарника
-make test         # сборка и запуск unit-тестов
-make check-style  # проверка форматирования (не изменяет файлы)
-make format       # автоформатирование всех .c и .h файлов
-make clean        # удаление артефактов сборки
+make              # Сборка бинарника
+make test         # Сборка и запуск unit-тестов
+make check-style  # Проверка форматирования (не изменяет файлы)
+make coverage     # Тесты + отчёт покрытия
+make format       # Автоформатирование всех .c и .h файлов
+make clean        # Удаление артефактов сборки
 ```
 
 ---
@@ -137,3 +138,4 @@ pwgen/
 
 Техническое задание находится в [`docs/ТЗ_PasswordGenerator.md`](docs/ТЗ_PasswordGenerator.md).
 
+Смотри Issues [`Здесь`](https://github.com/SuuNdeeR/pwgen-analogue/issues)

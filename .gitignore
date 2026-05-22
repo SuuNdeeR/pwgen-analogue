@@ -4,6 +4,7 @@ obj/*
 !bin/.gitkeep
 !obj/.gitkeep
 *.o
+*.gcov
 *.out
 pwgen
 test_pwgen

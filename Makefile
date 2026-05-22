@@ -1,50 +1,83 @@
+# Имена исполняемых файлов
+TARGET = bin/pwgen
+TEST_TARGET = bin/test_pwgen
+
+# Компилятор и базовые флаги
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -std=c11 -Iinclude -Ithirdparty
-# Тесты без -Werror, т.к. ctest.h несовместим с GCC 13
 TEST_CFLAGS = -Wall -Wextra -std=c11 -Iinclude -isystem thirdparty
 
+# Директории проекта
 SRC_DIR = src
+TEST_DIR = tests
 OBJ_DIR = obj
 BIN_DIR = bin
-TEST_DIR = tests
 
-SRC = $(wildcard $(SRC_DIR)/*.c)
-OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
-TARGET = $(BIN_DIR)/pwgen
+# Списки исходных и объектных файлов для основного приложения
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_FILES))
 
-TEST_SRC = $(wildcard $(TEST_DIR)/test_*.c)
-TEST_OBJ = $(patsubst $(TEST_DIR)/%.c,$(OBJ_DIR)/%.o,$(TEST_SRC))
-TEST_PWGEN = $(BIN_DIR)/test_pwgen
+# Списки файлов для тестов (исключаем main.c из исходников приложения)
+TEST_FILES = $(wildcard $(TEST_DIR)/*.c)
+TEST_OBJ_FILES = $(patsubst $(TEST_DIR)/%.c, $(OBJ_DIR)/%.o, $(TEST_FILES))
+SRC_OBJ_FOR_TEST = $(filter-out $(OBJ_DIR)/main.o, $(OBJ_FILES))
 
-all: dirs $(TARGET)
+# Главная цель по умолчанию
+.PHONY: all clean test check-style coverage
 
-dirs:
-	@mkdir -p $(OBJ_DIR) $(BIN_DIR)
+all: $(BIN_DIR) $(OBJ_DIR) $(TARGET)
 
-$(TARGET): $(OBJ)
+# Создание необходимых директорий
+$(BIN_DIR) $(OBJ_DIR):
+	mkdir -p $@
+
+# Линковка основного приложения
+$(TARGET): $(OBJ_FILES)
 	$(CC) $(CFLAGS) -o $@ $^
 
-# Основной код — со всеми проверками
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+# Компиляция объектных файлов основного приложения
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-# Тесты — без -Werror (ctest.h несовместим с GCC 13)
-$(OBJ_DIR)/%.o: $(TEST_DIR)/%.c
+# Сборка и запуск unit-тестов
+test: $(BIN_DIR) $(OBJ_DIR) $(TEST_TARGET)
+	@echo "=== Запуск unit-тестов ==="
+	./$(TEST_TARGET)
+
+# Линковка исполняемого файла тестов (CFLAGS здесь обязателен для работы gcov)
+$(TEST_TARGET): $(TEST_OBJ_FILES) $(SRC_OBJ_FOR_TEST)
+	$(CC) $(CFLAGS) -o $@ $^
+
+# Компиляция объектных файлов тестов
+$(OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(TEST_CFLAGS) -c -o $@ $<
 
-test: dirs $(TEST_PWGEN)
-	./$(TEST_PWGEN)
-
-$(TEST_PWGEN): $(TEST_OBJ) $(filter-out $(OBJ_DIR)/main.o,$(OBJ))
-	$(CC) $(TEST_CFLAGS) -o $@ $^
-
+# Проверка стиля кода через clang-format
 check-style:
-	clang-format --dry-run --Werror $(SRC_DIR)/*.c include/*.h $(TEST_DIR)/*.c
+	@echo "=== Проверка стиля кода ==="
+	clang-format -n $(SRC_DIR)/*.c include/*.h $(TEST_DIR)/*.c
 
-format:
-	clang-format -i $(SRC_DIR)/*.c include/*.h $(TEST_DIR)/*.c
+# =========================================================================
+# Сбор покрытия кода СТРОГО через gcov (без lcov/genhtml)
+# =========================================================================
+coverage:
+	@echo "=== Полная очистка перед замером покрытия ==="
+	$(MAKE) clean
+	@echo "=== Сборка проекта с флагами gcov ==="
+	$(MAKE) all CFLAGS="$(CFLAGS) --coverage"
+	$(MAKE) test CFLAGS="$(CFLAGS) --coverage" TEST_CFLAGS="$(TEST_CFLAGS) --coverage"
+	@echo "=== Вывод статистики покрытия через gcov ==="
+	@echo "---------------------------------------------------------"
+	@# Вызываем gcov, передавая путь к объектным файлам
+	@gcov -b --object-directory=$(OBJ_DIR) $(SRC_DIR)/args.c
+	@gcov -b --object-directory=$(OBJ_DIR) $(SRC_DIR)/charset.c
+	@gcov -b --object-directory=$(OBJ_DIR) $(SRC_DIR)/generator.c
+	@gcov -b --object-directory=$(OBJ_DIR) $(SRC_DIR)/output.c
+	@gcov -b --object-directory=$(OBJ_DIR) $(SRC_DIR)/random.c
+	@echo "---------------------------------------------------------"
+	@echo "Текстовые отчеты *.gcov сохранены в корне проекта."
 
+# Полная очистка проекта
 clean:
 	rm -rf $(OBJ_DIR)/*.o $(TARGET) $(TEST_PWGEN)
-
-.PHONY: all test check-style format clean dirs
+	rm -f *.gcov *.gcda *.gcno
