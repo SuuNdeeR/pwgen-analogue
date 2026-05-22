@@ -15,9 +15,16 @@ typedef struct {
     bool no_ambiguous;
 } PwgenOptions;
 
-int parse_args(int argc, char* argv[], PwgenOptions* opts);
+typedef enum {
+    PARSE_OK = 0,
+    PARSE_ERROR = 1,
+    PARSE_HELP = 2,
+    PARSE_VERSION = 3
+} ParseResult;
+
 void set_default_options(PwgenOptions* opts);
+ParseResult parse_args(int argc, char* argv[], PwgenOptions* opts);
 void print_help(void);
 void print_version(void);
 
-#endif
+#endif /* ARGS_H */

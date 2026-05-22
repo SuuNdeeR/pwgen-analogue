@@ -172,7 +172,7 @@ pwgen/
 **`main.c`** — точка входа и связующий:
 - Инициализирует `PwgenOptions` значениями по умолчанию (set_default_options).
 - Вызывает `parse_args()`. По возвращаемому коду:  
-   • HELP/VERSION → вызывает `print_help()/print_version()` -> exit(0).  
+   • HELP/VERSION -> вызывает `print_help()/print_version()` -> exit(0).  
    • ERROR -> exit(1) (сообщение уже выведено в stderr).  
    • OK -> переходит к генерации.  
 - Один раз вызывает `charset_build()` для формирования алфавита (до цикла).  
