@@ -111,3 +111,63 @@ CTEST(generator, invalid_arguments)
     ret = generate_password(buf, 8, NULL);
     ASSERT_EQUAL(2, ret);
 }
+
+CTEST(generator, trigger_ensure_requirements_standard)
+{
+    /* Первый «холостой» вызов, чтобы rand_initialized стал 1
+       и generate_password больше не трогал srand(time(NULL)) */
+    char buf[128];
+    PwgenOptions opts = {0};
+    generate_password(buf, 8, &opts);
+
+    opts.capitalize = true;
+    opts.numerals = true;
+    opts.symbols = true;
+
+    /* Длина 4 и три класса — вероятность, что случайно выпадут
+       все классы сразу, мала. За 200 итераций с разными seed'ами
+       ensure_requirements и random_class_char гарантированно
+       отработают по всем веткам (upper, digit, special). */
+    for (int seed = 1; seed <= 200; seed++) {
+        srand((unsigned int)seed);
+        generate_password(buf, 4, &opts);
+        ASSERT_EQUAL(4, (int)strlen(buf));
+    }
+}
+
+CTEST(generator, trigger_ensure_requirements_secure)
+{
+    ASSERT_EQUAL(0, random_init());
+
+    char buf[128];
+    PwgenOptions opts = {0};
+    opts.capitalize = true;
+    opts.numerals = true;
+    opts.symbols = true;
+    opts.secure = true;
+
+    for (int i = 0; i < 50; i++) {
+        generate_password(buf, 4, &opts);
+        ASSERT_EQUAL(4, (int)strlen(buf));
+    }
+
+    random_cleanup();
+}
+
+CTEST(generator, no_ambiguous_in_ensure_requirements)
+{
+    char buf[128];
+    PwgenOptions opts = {0};
+    generate_password(buf, 8, &opts); /* init rand_initialized */
+
+    opts.capitalize = true;
+    opts.numerals = true;
+    opts.symbols = true;
+    opts.no_ambiguous = true;
+
+    for (int seed = 1; seed <= 200; seed++) {
+        srand((unsigned int)seed);
+        generate_password(buf, 4, &opts);
+        ASSERT_EQUAL(4, (int)strlen(buf));
+    }
+}
